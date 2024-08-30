@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOG BREED CLASSIFIER</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="static/style.css">
+</head>
+<body>
+
+<style>
+    .image-container {
+      width: 400px;
+      margin: 200px auto 20px auto; 
+      backdrop-filter: blur(5px);
+      background-color: rgba(255, 255, 255, 0.8);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: -10px;
+      margin-right: -5px;
+      overflow: hidden;
+    }
+    .image-preview {
+      width: 200px;
+      height: 170px;
+      object-fit: contain;
+    }
+
+    .send-button {
+      margin-top: 10px;
+      background-color: #c43a3a;
+      border: none;
+      color: rgb(238, 232, 232);
+      padding: 10px 20px;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    .send-button:hover {
+      background-color: rgb(63, 199, 58);
+    }
+
+    .result-container {
+      margin-top: 10px;
+      font-size: 20px;
+      font-family: brandon-grotesque, sans-serif;
+      color: rgb(82, 78, 78);
+      word-wrap: break-word;
+    }
+</style>
+
+<script>
+  function previewImage(event) {
+    var reader = new FileReader();
+    reader.onload = function() {
+      var output = document.getElementById('preview');
+      output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
+
+  function sendToModel() {
+    var fileInput = document.getElementById('imageInput');
+    var file = fileInput.files[0];
+
+    var formData = new FormData();
+    formData.append('image', file);
+
+    fetch('/predict', {
+      method: 'POST',
+      body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+      var resultContainer = document.getElementById('result');
+      resultContainer.innerHTML = 'Predicted Breed:<br />' + data.class;
+    })
+    .catch(error => {
+      console.error('Error:', error);
+    });
+  }
+</script>
+<section class="home" id="home">
+  <a href="#" class="logo" style="position: absolute; top: 20px; left: 800px; font-size: 40px; color: white;"> <i class="fas fa-paw"></i> Dog Breed Classifier </a>
+
+  <div class="image-container">
+    <h1>Upload Image to Classify the Dog Breed</h1><br/>
+    <input type="file" id="imageInput" accept="image/*" onchange="previewImage(event)"><br/>
+
+    <img id="preview" class="image-preview" src="#" alt="Image Preview"><br/>
+    <button class="send-button" onclick="sendToModel()">Send to Model</button>
+
+    <div id="result" class="result-container"></div>
+  </div>
+
+  <img src="static/image/bottom_wave.png" class="wave" alt="">
+</section>
+
+</body>
+</html>
